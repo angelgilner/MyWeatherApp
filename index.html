@@ -7,25 +7,111 @@
     <title>MyWeatherApp</title>
     <!-- Bootstrap Core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <link href="css/weather-icons.min.css" rel="stylesheet">
 </head>
 
 <body>
 <!-- Navigation -->
 
-<nav class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="#">WebSiteName</a>
+<nav class="navbar navbar navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">
+        <img src="" width="30" height="30" class="d-inline-block align-top" alt="">
+        MyWeatherApp
+    </a>
+</nav>
+
+    <!-- Content -->
+
+    <div class="container">
+
+        <div class="input-group mb-3 inputGroup-sizing-lg search">
+            <input type="text" class="form-control inp" placeholder="Wpisz swoje miasto..." aria-label="Wpisz swoje miasto..." aria-describedby="button-addon2">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary butt" type="button" id="button-addon2">OK</button>
+            </div>
         </div>
     </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row justify-content-md-center">
+            <div class="col-md-2 weathernow centered">
+                <div id="date">07.03.2019</div>
+                <div id="city"><b>WARSZAWA</b></div>
+                <i class="wi wi-day-sunny mainicon"></i>
+                <div id="tempnow">1C</div>
+                <div id="desc">Sunny</div>
+            </div>
+<div class="form-group">
+            <div class="col-md-12 weatherdetails centered">
+                <ul class="list-group lists">
+                    <li class="list-group-item lihead">HUMIDITY</li>
+                    <li class="list-group-item">65 %</li>
+                </ul>
 
-<!-- Content -->
-<div class="container">
+                <ul class="list-group lists">
+                    <li class="list-group-item lihead">PRESSURE</li>
+                    <li class="list-group-item">992 hpa</li>
+                </ul>
 
+                <ul class="list-group lists">
+                    <li class="list-group-item lihead">RAIN</li>
+                    <li class="list-group-item">1.46 mm</li>
+                </ul>
 
+                <ul class="list-group lists">
+                    <li class="list-group-item lihead">CLOUDS</li>
+                    <li class="list-group-item">20 %</li>
+                </ul>
+
+                <ul class="list-group lists">
+                    <li class="list-group-item lihead">WIND</li>
+                    <li class="list-group-item">8.57 m/s</li>
+                </ul>
+
+            </div>
+    <div class="col-md-12 weatherdetails centered">
+        <table class="table table-borderless">
+            <thead class="datetr">
+            <tr>
+                <th scope="col">8 MAR</th>
+                <th scope="col">9 MAR</th>
+                <th scope="col">10 MAR</th>
+                <th scope="col">11 MAR</th>
+                <th scope="col">12 MAR</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="icon">
+                <td><i class="wi wi-day-cloudy"></i></td>
+                <td><i class="wi wi-day-rain"></i></td>
+                <td><i class="wi wi-day-showers"></i></td>
+                <td><i class="wi wi-day-sunny"></i></td>
+                <td><i class="wi wi-day-sleet-storm"></i></td>
+            </tr>
+
+            <tr class="temp">
+                <td>10C</td>
+                <td>12C</td>
+                <td>8C</td>
+                <td>4C</td>
+                <td>20C</td>
+            </tr>
+
+            <tr>
+                <td>CLOUDY</td>
+                <td>RAIN</td>
+                <td>SHOWERS</td>
+                <td>SUNNY</td>
+                <td>STORM</td>
+            </tr>
+            </tbody>
+        </table>
+
+    </div>
 </div>
 
+    </div>
 
 
 
@@ -37,5 +123,60 @@
 
     <!-- Bootstrap Core JavaScript -->
     <script src="js/bootstrap.js"></script>
+
+<script>
+    // funkcja konwertujaca K na C
+    function calculate(kelvin) {
+        // zaokraglaj wynik w gore
+        return Math.ceil(kelvin - 272.15);
+    }
+
+    function addElement(value) {
+        // tworzenie elementu listy
+        var li = document.createElement('li');
+        // uzupełnienie nowo utworzonego elementu trescia
+        li.innerText = value;
+        // wybieram liste z drzewa DOM
+        var ul = document.querySelector('ul');
+        // dodaj nowo utworzony element do listy
+        ul.appendChild(li);
+    }
+
+    // wybieram przycisk z drzewa DOM
+    var button = document.querySelector('button');
+    // nasluchiwanie na klikniecie w button
+    button.onclick = function() {
+        // wybieram input z drzewa DOM
+        var input = document.querySelector('input');
+        // sprawdzam czy input nie ma pustej wartosci
+        if (input.value.trim() !== '') {
+            // pobranie danych z serwera (open weather map)
+            fetch(
+                'https://api.openweathermap.org/data/2.5/forecast?q=' +
+                input.value +
+                '&appid=ae76d0efed32d9f29c4d54a5738b80ca'
+            )
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(jsonData) {
+                    // sprawdzam czy istnieja dane do wyswietlenia
+                    if (jsonData.cod === '200') {
+                        jsonData.list.forEach(function(item) {
+                            addElement(item.dt_txt + ': ' + calculate(item.main.temp)+ ' ℃');
+                        });
+                    } else {
+                        // dane nie istnieja
+                        alert('Upppssss...');
+                    }
+                })
+                .catch(function(error) {
+                    // tutaj osblugujemy bledy popelnione w wywolaniu zwrotnym powyzej
+                    // czyli w funkcji .then(...)
+                    console.warn('Nasz error:', error);
+                });
+        }
+    };
+</script>
 </body>
 </html>
